@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/static/ballmungApp/css/ballmung.css">
+    <title>Document</title>
+
+
+</head>
+
+<body>
+    
+    <!-- 인터페이스 -->
+    {% include "nav.html" %}
+
+    <div class="wrapper">
+        <div>
+            <div>
+                <p id="info"></p>
+            </div>
+            <div>
+                <canvas id="myCanvas"></canvas>
+                <div id="resultScreen">
+
+                </div>
+            </div>
+            <div>
+                <button id="saveButton">적립!!</button>
+                <button id="restartButton">다시시작</button>
+            </div>
+        </div>
+        <div class="container">
+            <div id="rankTable">
+                <div>
+                    <p>순위 (상위 10명)<p>          
+                    <table class="">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Score</th>
+                                <th>Time</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% load time_filter %}
+                            {% for rd in rankdata %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ rd.nickname }}</td>
+                                    <td>{{ rd.score }}</td>
+                                    <td>{{ rd.clearTime | sub }}</td>
+                                    <td>{{ rd.regiDate }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="submitDiv">
+                <form name="submitRankForm" action="/ballmung/rank/" method="post">
+                    <p>순위표에 등록하시겠습니까?</p>
+                    <p id="pTag_showScoreTime">score: 0점, 걸린시간:0.00초</p>
+                    <input type="hidden" name="score" value="0"/>
+                    <input type="hidden" name="clearTime" value="0"/>
+                    <input type="text" placeholder="닉네임 입력"name="name"/>
+                    <button>등록하기</button>
+                    {% csrf_token %}
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/static/ballmungApp/js/map.js"></script>
+    <script src="/static/ballmungApp/js/ball.js"></script>
+    <script src="/static/ballmungApp/js/wall.js"></script>
+    <script src="/static/ballmungApp/js/checkCollision.js"></script>
+    <script>
+
+        document.body.onselectstart = () => false; //드래그 방지
+
+        let mousePos = {x:0, y:0}
+
+        let init_gameInfo = {
+            gameState: 0,
+            leftBall: 100,
+            endState: 0,
+            timerId: "",
+            ontimer: false,
+            timeLimit: 6000,
+            currentSecond: 6000,
+            score: 0,
+            isCountingBall: false,
+            isSubmitToRank: false,
+            isVisibleSubmitDiv: false,
+        };
+
+        let gameInfo = {
+            wallSize: 10,
+            leftBall: 100,
+            gameState: 0, //0:시작전, 1:게임중, 2:정산및 끝마칠때
+            endState: 0,    /*
+                            0:공이 점점사라지기,
+                            1:도착한 공을 변수에 따로 넣기
+                            2:도착한 공들 정렬시킬 좌표 정하기
+                            3:골인 지점에 도착한공들 부드럽게 이동시키기
+                            4:종료
+                            */
+            //click here to play Button size
+            chtp_ButtonSize: { x: 5, y: 5, width: 0, height: 0 },
+            goalArea: {x:0, y:0, width: 0, height: 0},
+            timerId: "",
+            ontimer: false,
+            timeLimit: 6000,
+            currentSecond: 6000,
+            score: 0,
+            isSubmitToRank: false,
+            isCountingBall: false,
+            isVisibleSubmitDiv: false,
+        };
+
+        //캔버스 사이즈 설정하기
+        canvasSize = { width: map01[0].length * gameInfo.wallSize, height: map01.length * gameInfo.wallSize };
+        const canvas = document.querySelector('#myCanvas');
+        canvas.setAttribute('width', `${canvasSize.width}`)
+        canvas.setAttribute('height', `${canvasSize.height}`)
+
+        //버튼의 사이즈 설정하기
+        gameInfo.chtp_ButtonSize.width = canvasSize.width - 10;
+        gameInfo.chtp_ButtonSize.height = gameInfo.wallSize * 9;
+        //골 지역 위치 및 크기 설정하기
+        gameInfo.goalArea.x = 90;
+        gameInfo.goalArea.y = 290;
+        gameInfo.goalArea.width = 70;
+        gameInfo.goalArea.height = 40;
+
+
+        //공 객체를 저장할 변수
+        let ballList = [];
+        let wallList = [];
+
+        //도착지점에 도달한 공을 저장할 변수
+        let goalBallList = [];
+
+        //2d로 그릴수 있는 객체 변수
+        const ctx = canvas.getContext("2d");
+
+        //
+        let pInfo = document.querySelector('#info');
+
+        //각종 변수들 출력하기
+        function printInfo() {
+            pInfo.innerHTML = `
+
+            공의갯수:${ballList.length}<br>
+            타이머:${gameInfo.currentSecond}<br>
+            점수:${gameInfo.score}<br>
+            x좌표:${mousePos.x}, y좌표:${mousePos.y}<br>
+            캔버스를 클릭해주세요!!
+            `;
+        }
+
+        //공 이동시키기
+        function moveBall() {
+            for (let i = 0; i < ballList.length; i++) {
+                //공 x축 방향으로 이동시키기
+                ballList[i].setX(ballList[i].getX() + (ballList[i].getSpeed() * ballList[i].getXyDir()));
+
+
+                //공이 오른쪽화면으로 넘어간다면 반대방향으로 이동시키기
+                if (ballList[i].getRight() >= canvasSize.width) {
+                    ballList[i].setX(canvasSize.width - (ballList[i].getSize() * 2));
+                    ballList[i].setXyDir(ballList[i].getXyDir() * (-1));
+                }
+                //공이 왼쪽화면으로 넘어간다면 반대방향으로 이동시키기
+                if (ballList[i].getLeft() <= 0) {
+                    ballList[i].setX(0 + ballList[i].getSize());
+                    ballList[i].setXyDir(ballList[i].getXyDir() * (-1));
+                }
+
+                //공 y축 방향으로 이동시키기
+                ballList[i].setY(ballList[i].getY() - ballList[i].getDy());
+                ballList[i].setDy(ballList[i].getDy() - ballList[i].getGravity());
+
+                //떨어질때 속도가 너무 빠르면 속도 고정시키기
+                if (ballList[i].getDy() <= -4.9) {
+                    ballList[i].setDy(-4.9);
+                }
+
+                //캔버스 아래로 떨어질 경우 공 띄우기
+                if (ballList[i].getBottom() >= canvasSize.height) {
+                    ballList[i].setDy(ballList[i].getJump());
+                    ballList[i].setY(canvasSize.height - ballList[i].getSize());
+                }
+            }
+        }
+
+        //공 화면에 나타내기
+        function drawBall() {
+            for (let i = 0; i < ballList.length; i++) {
+                ctx.beginPath();
+                ctx.strokeStyle = ballList[i].getRgba(); //원의 둘레 색
+                ctx.arc(ballList[i].getX(), ballList[i].getY(), ballList[i].getSize(), 0, 2 * Math.PI); //x, y, 반지름, 시작각도, 마지막각도
+                ctx.closePath();
+                ctx.stroke();
+                ctx.fillStyle = ballList[i].getRgba();
+                ctx.fill(); //색채우기
+            }
+
+        }
+
+        //벽 생성시키기 (한번만)
+        function createWall() {
+            for (let i = 0; i < map01[0].length; i++) {
+                for (let j = 0; j < map01.length; j++) {
+                    if (map01[j][i] == 1) {
+                        wallList.push(new Wall(i * gameInfo.wallSize, j * gameInfo.wallSize));
+                    }
+                }
+            }
+        }
+        createWall();
+
+        //벽 화면에 나타내기
+        function drawWall() {
+            //벽그리기
+            //ctx.strokeStyle = "black";
+            ctx.fillStyle = "pink";
+
+            for (let i = 0; i < wallList.length; i++) {
+                //ctx.strokeRect(wallList[i].getX(), wallList[i].getY(), wallList[i].getSize(), wallList[i].getSize()); // 선만 있는 사각형 생성
+                ctx.fillRect(wallList[i].getX(), wallList[i].getY(), wallList[i].getSize(), wallList[i].getSize()); // 색만 있는 사각형 생성 x,y,width,height
+            }
+        }
+
+        //게임상태 화면 나타내기
+        function gameStateScreen() {
+            if (gameInfo.gameState == 0) {
+
+                //배경 약간 어둡게
+                ctx.fillStyle = "rgba(32, 55, 106, 0.3)";
+                ctx.fillRect(0, 0, canvasSize.width, canvasSize.height);
+
+                //click here to play를 감쌀 사각형
+                ctx.fillStyle = "rgba(203, 226, 157, 0.8)";
+                ctx.fillRect(gameInfo.chtp_ButtonSize.x, gameInfo.chtp_ButtonSize.y, gameInfo.chtp_ButtonSize.width, gameInfo.chtp_ButtonSize.height);
+
+                //click here to play 텍스트의 좌표는 정중앙
+                ctx.fillStyle = "black";
+                ctx.font = "italic bold 20px Arial, sans-serif";
+                ctx.textAlign = "center"
+                ctx.textBaseline = "middle"
+                let tx = gameInfo.chtp_ButtonSize.x + (gameInfo.chtp_ButtonSize.width / 2);
+                let ty = gameInfo.chtp_ButtonSize.y + (gameInfo.chtp_ButtonSize.height / 2);
+                ctx.fillText("click here to play", tx, ty, 160); //텍스트, x좌표, y좌표, 최대너비
+
+            }else if(gameInfo.gameState == 1){
+                //click here to play를 감쌀 사각형
+                ctx.fillStyle = "rgba(203, 226, 157, 0.8)";
+                ctx.fillRect(gameInfo.chtp_ButtonSize.x, gameInfo.chtp_ButtonSize.y, gameInfo.chtp_ButtonSize.width, gameInfo.chtp_ButtonSize.height);
+                
+                //남은 공의 개수 보이기
+                ctx.fillStyle = "rgba(0,0,0,0.3)";
+                ctx.font = "italic bold 40px Arial, sans-serif";
+                ctx.textAlign = "center"
+                ctx.textBaseline = "middle"
+                let tx = gameInfo.chtp_ButtonSize.x + (gameInfo.chtp_ButtonSize.width / 2);
+                let ty = gameInfo.chtp_ButtonSize.y + (gameInfo.chtp_ButtonSize.height / 2);
+                //console.log(tx, ty);
+                ctx.fillText(gameInfo.leftBall, tx, ty, 60); //텍스트, x좌표, y좌표, 최대너비
+
+                //골인 지점을 감쌀 사각형
+                ctx.fillStyle = "rgba(172, 161, 222, 1)";
+                ctx.fillRect(gameInfo.goalArea.x, gameInfo.goalArea.y, gameInfo.goalArea.width, gameInfo.goalArea.height);
+
+                //남은 시간 보이기 좌표는 bottom right
+                ctx.fillStyle = "rgba(0,0,0,0.7)";
+                ctx.font = "italic bold 14px Arial, sans-serif";
+                ctx.textAlign = "right"
+                ctx.textBaseline = "bottom"
+                tx = canvasSize.width;
+                ty = canvasSize.height;
+                ctx.fillText(`남은시간:${parseInt(gameInfo.currentSecond / 100)}`, tx-5, ty, 60); //텍스트, x좌표, y좌표, 최대너비
+                
+            }else if(gameInfo.gameState == 2){
+                //골인 지점을 감쌀 사각형
+                ctx.fillStyle = "rgba(172, 161, 222, 1)";
+                ctx.fillRect(gameInfo.goalArea.x, gameInfo.goalArea.y, gameInfo.goalArea.width, gameInfo.goalArea.height);
+                
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); //화면 청소
+            //printInfo(); //각종 변수 출력하기
+
+            switch (gameInfo.gameState) {
+                case 0: //게임 시작전
+                    drawWall();
+                    gameStateScreen();
+
+                    break;
+                case 1: //게임 중인상황
+                    gameStateScreen();
+                    moveBall();
+                    //충돌체크
+                    for (let i = 0; i < ballList.length; i++) {
+                        for (let j = 0; j < wallList.length; j++) {
+                            checkCollision(ballList[i], wallList[j]);
+                        }
+                    }
+                    drawBall();
+                    drawWall();
+
+                    
+                    break;
+                case 2:
+                    
+                    //공이 사라지게 하는 단계
+                    if(gameInfo.endState == 0){
+                        //공의갯수 검사하기
+                        if(gameInfo.isCountingBall==true){
+                            for (let i = 0; i < ballList.length; i++) {
+                                //공과 골인지역 충돌체크
+                                if (ballList[i].getX() >= gameInfo.goalArea.x && ballList[i].getX() <= gameInfo.goalArea.x + gameInfo.goalArea.width
+                                && ballList[i].getY() >= gameInfo.goalArea.y && ballList[i].getY() <= gameInfo.goalArea.y + gameInfo.goalArea.height) {
+                                    ballList[i].isGoal = true;
+                                    gameInfo.score++;
+                                }
+                            }
+                            gameInfo.isCountingBall = false; //한번만 검사하기
+                        }
+
+
+                        //골인지점에 오지못한 공은 점점 투명하게 만들기
+                        for (let i = 0; i < ballList.length; i++) {
+                            if(ballList[i].isGoal == false){
+                                ballList[i].setAlpha(ballList[i].getAlpha()-0.01);
+                                ballList[i].changeColor();
+                            } 
+                        }
+                        
+                        //알파값이 0보다 작다면 endState를 1로
+                        for (let i = 0; i < ballList.length; i++) {
+                            if(ballList[i].isGoal == false){
+                                if(ballList[i].getAlpha() <= 0){
+                                gameInfo.endState = 1;
+                                break;
+                            }
+                            } 
+                        }
+                        
+                    }else if(gameInfo.endState == 1){ //도착한 공만 따로 변수에 넣기
+                        for (let i = 0; i < ballList.length; i++) {
+                            if(ballList[i].isGoal == true){
+                                goalBallList.push(ballList[i]);
+                            }
+                        }
+                        
+                        gameInfo.endState = 2; //다음단계로
+                    }else if(gameInfo.endState == 2){ //도착한 공들 잘 정렬시키기
+                        const rowDistance = 15; //행 간격
+                        const columnDistance = canvas.width / 11; //열간격
+                        let i = 1;
+                        let j = 1;
+                        for (let k = 0; k < goalBallList.length; k++) {
+                            goalBallList[k].setGX(columnDistance  * i); //x좌표 지정
+                            goalBallList[k].setGY(rowDistance * j); //y좌표 지정
+                            i++;
+                            if(i>=11){ //10단위로 끊어서 배치
+                                i=1;
+                                j++;
+                            }
+                        }
+                        gameInfo.endState = 3;
+                        gameInfo.isSubmitToRank = true;
+                    }else if(gameInfo.endState == 3){//골인 지점에 도착한공들 부드럽게 이동시키기
+                        for (let i = 0; i < goalBallList.length; i++) {
+                            // let dx = goalBallList[i].getX() - goalBallList[i].getGX();
+                            // let dy = goalBallList[i].getY() - goalBallList[i].getGY();
+
+                            // let d = Math.sqrt(dx*dx - dy*dy);
+                            let v = 0.02;
+                            goalBallList[i].setX(goalBallList[i].getX() + v*(goalBallList[i].getGX()-goalBallList[i].getX()));
+                            goalBallList[i].setY(goalBallList[i].getY() + v*(goalBallList[i].getGY()-goalBallList[i].getY()));
+                        }
+
+                        // form태그에 값 전달시키기
+                        if (gameInfo.isSubmitToRank == true){
+                            document.submitRankForm.score.value = gameInfo.score;
+                            let time = gameInfo.timeLimit - gameInfo.currentSecond
+                            document.submitRankForm.clearTime.value = time;
+                            document.querySelector("#pTag_showScoreTime").innerHTML = `score: ${gameInfo.score}점, 걸린시간:${time/100}초`;
+                            gameInfo.isSubmitToRank = false;
+                        }
+                    }
+                    
+                    gameStateScreen();
+                    drawBall();
+                    break;
+            }
+        }
+
+        //캔버스를 클릭하면 게임시작 및 공 생성시키기
+        canvas.addEventListener("click", (event) => {
+            
+            //게임상태가 0(게임시작전) 1(게임중)일때만 공생성
+            if(gameInfo.gameState == 0 || gameInfo.gameState == 1){
+                const x = event.clientX - ctx.canvas.offsetLeft;
+                const y = event.clientY - ctx.canvas.offsetTop;
+
+                //정해진 범위 내에서만 공 생성시키기
+                if (x >= gameInfo.chtp_ButtonSize.x && x <= gameInfo.chtp_ButtonSize.x + gameInfo.chtp_ButtonSize.width
+                    && y >= gameInfo.chtp_ButtonSize.y && y <= gameInfo.chtp_ButtonSize.y + gameInfo.chtp_ButtonSize.height) {
+                        if(gameInfo.leftBall > 0){
+                            const speed = 0.5 + (Math.floor(Math.random() * 51) / 100); // 0.5~ 1의 값
+                            const jump = 3 + (Math.floor(Math.random() * 31) / 100); //3~6의값
+                            const gravity = 0.05 + (Math.floor(Math.random() * 16) / 100); //0.05~0.20의값
+                            const xyDir = (Math.floor(Math.random() * 2)); //0또는 1의값
+                            const color = "#" + Math.floor(Math.random() * 16777215).toString(16); //랜덤색상
+                            //const color = "#" + Math.round(Math.random() * 0xffffff); //랜덤색상
+                            const r = parseInt((color.substring(1,3)), 16);
+                            const g = parseInt((color.substring(3,5)), 16);
+                            const b = parseInt((color.substring(5,7)), 16);
+                            this.rgba = `rgba(${r},${g},${b},1.0)`; // #000000에서 rgba(0,0,0,1.0)으로 변환
+                        
+                            ballList.push(new Ball(x, y, speed, jump, gravity, xyDir, color, rgba)); //x, y, speed, jump, gravity, color
+                            gameInfo.leftBall--;
+
+                            //게임중인 상태로 바꿈
+                            gameInfo.gameState = 1;
+                        }
+
+                    //타이머 작동
+                    if(gameInfo.ontimer == false){
+                        gameInfo.ontimer = true;
+                        gameInfo.timerId = setInterval(()=>{
+                            gameInfo.currentSecond--;
+                            //타이머가 다 지나거나 게임을 중간에 중지한경우 게임끝남
+                            if(gameInfo.currentSecond==0){
+                                clearInterval(gameInfo.timerId);
+                                gameInfo.gameState = 2;
+                                gameInfo.isCountingBall = true;
+                            }
+                        },10);
+                    }
+                }
+            }
+            
+        });
+
+        
+        //마우스를 움직이면 좌표가 뜸
+        canvas.addEventListener("mousemove", (e)=>{
+            mousePos.x = event.clientX - ctx.canvas.offsetLeft;
+            mousePos.y = event.clientY - ctx.canvas.offsetTop;
+        });
+
+        //적립버튼을 눌렀을때 게임 끝남
+        document.querySelector("#saveButton").addEventListener("click", (e) => {
+            if (gameInfo.gameState == 1){
+                clearInterval(gameInfo.timerId);
+                gameInfo.ontimer = false;
+                gameInfo.gameState = 2;
+                gameInfo.isCountingBall = true;
+            }
+        });
+
+        //restart버튼을 눌렀을때 게임 재시작 및 각종 변수 초기화
+        document.querySelector("#restartButton").addEventListener("click", (e) => {
+            clearInterval(gameInfo.timerId);
+            for(let i in init_gameInfo){
+                gameInfo[i] = init_gameInfo[i];
+            }
+            ballList = [];
+            goalBallList = [];
+            /*
+            gameInfo.gameState = init_gameInfo.gameState;
+            gameInfo.endState = init_gameInfo.endState; 
+            gameInfo.ontimer = init_gameInfo.ontimer;
+            gameInfo.currentSecond = init_gameInfo.currentSecond;
+            gameInfo.isCountingBall = init_gameInfo.isCountingBall;
+            gameInfo.score = init_gameInfo.score;
+            ballList = [];
+            goalBallList = [];
+            */
+        });
+
+        setInterval(draw, 16); // 약 60프레임 마다 실행
+
+    </script>
+</body>
+
+</html>
