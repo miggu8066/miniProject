@@ -17,11 +17,13 @@ from django.contrib import admin
 from django.urls import include, path
 from mainApp import views as mainViews
 from ballmungApp import views as ballmungViews
+from puzzleApp import views as puzzleViews
 
 urlpatterns = [
     #path('first/', include('firstapp.urls')), include쓸때
     path("admin/", admin.site.urls),
     path("", include('mainApp.urls')),
     path("ballmung/", include('ballmungApp.urls')),
+    path("puzzleApp/", include('puzzleApp.urls')),
     path("rank/", mainViews.rank, name="rank"),
 ]

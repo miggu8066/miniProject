@@ -6,7 +6,7 @@ from puzzleApp import views
 app_name = "puzzleApp"
 urlpatterns = [
     path("name/", views.name),
-    path("start/", views.start),
+    path("", views.start),
     path("insert/", views.insert),
     path("show/", views.show, name='show'),
 

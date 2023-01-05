@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "mainApp",
+    "puzzleApp",
     "ballmungApp",
     "django.contrib.admin",
     "django.contrib.auth",
