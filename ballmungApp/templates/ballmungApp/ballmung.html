@@ -55,7 +55,7 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ rd.nickname }}</td>
                                     <td>{{ rd.score }}</td>
-                                    <td>{{ rd.clearTime | sub }}</td>
+                                    <td>{{ rd.clearTime | time_filter }}</td>
                                     <td>{{ rd.regiDate }}</td>
                                 </tr>
                             {% endfor %}
