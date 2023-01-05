@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/ballmung.css">
+    <title>퍼즐게임</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+
+        }
+
+        :root {
+            /* 반복사용하는 것을 변수 선언 */
+            --facebook: #3b5998
+        }
+
+        .wrap-all {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            
+        }
+
+        .play-time {
+            font-size: 3rem;
+            margin-top: 2rem;
+            color:white;
+            display: none;
+        }
+
+        .image-container {
+            margin-top: 1rem;
+            list-style: none;
+            /* border: 2px solid var(--facebook); */
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .image-container * {
+            width: 100px;
+            height: 100px;
+            border: 1px solid red;
+            color: white;
+            background: url("https://placeimg.com/400/400/any");
+        }
+
+        .start-button {
+            background: var(--facebook);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            margin-top: 10px;
+            font-size: 20px;
+            border: 1px white solid;
+            border-radius: 5px;
+
+        }
+        .restart-button {
+            background: var(--facebook);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            margin-top: 10px;
+            font-size: 20px;
+            border: 1px white solid;
+            border-radius: 5px;
+            display: none;
+
+        }
+
+        .game-text {
+            position: absolute;
+            width: 400px;
+            background-color: gray;
+            font-size: 45px;
+            color: white;
+            text-shadow: 1px 1px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+        [for=username],[for=temptime],[for=tempdate]{
+            font-size: 20px;
+            margin-left: 5px;
+        }
+
+        .list0 {
+            background-position-x: 0px;
+            background-position-y: 0px;
+        }
+
+        .list1 {
+            background-position-x: -100px;
+            background-position-y: 0px;
+        }
+
+        .list2 {
+            background-position-x: -200px;
+            background-position-y: 0px;
+        }
+
+        .list3 {
+            background-position-x: -300px;
+            background-position-y: 0px;
+        }
+
+        .list4 {
+            background-position-x: 0px;
+            background-position-y: -100px;
+        }
+
+        .list5 {
+            background-position-x: -100px;
+            background-position-y: -100px;
+        }
+
+        .list6 {
+            background-position-x: -200px;
+            background-position-y: -100px;
+        }
+
+        .list7 {
+            background-position-x: -300px;
+            background-position-y: -100px;
+        }
+
+        .list8 {
+            background-position-x: 0px;
+            background-position-y: -200px;
+        }
+
+        .list9 {
+            background-position-x: -100px;
+            background-position-y: -200px;
+        }
+
+        .list10 {
+            background-position-x: -200px;
+            background-position-y: -200px;
+        }
+
+        .list11 {
+            background-position-x: -300px;
+            background-position-y: -200px;
+        }
+
+        .list12 {
+            background-position-x: 0px;
+            background-position-y: -300px;
+        }
+
+        .list13 {
+            background-position-x: -100px;
+            background-position-y: -300px;
+        }
+
+        .list14 {
+            background-position-x: -200px;
+            background-position-y: -300px;
+        }
+
+        .list15 {
+            background-position-x: -300px;
+            background-position-y: -300px;
+        }
+        .puzzle-a{
+            display: grid;
+            grid-template-rows: 2fr 2fr;
+            grid-template-columns: 2fr 2fr;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            background-color: white;
+        }
+        .puzzle-a>img:nth-of-type(1){
+            grid-column: 1;
+            grid-row: 1;
+        }
+        .puzzle-a>img:nth-child(2){
+            grid-column: 1;
+            grid-row: 2;
+        }
+        div img{
+            margin: 10px 10px 10px 30px;
+            border: 2px solid black;
+            border-radius: 5px;
+        }
+        .puzzle-c{
+            display: grid;
+            grid-column: 2/3;
+            grid-row: 1/3;
+            align-items: center;
+        }
+
+        </style>
+</head>
+
+<body>
+    {% include "nav.html"  %}
+    <div class="puzzle-big">
+        <div class="puzzle-a">
+            <img src="/static/puzzleApp/images/puzzle1.png" width="200px">
+            <img src="/static/puzzleApp/images/puzzle2.png" width="200px">
+            <div class="puzzle-c" >
+                <h1 style="margin-left: 30px;">Puzzle Game</h1>
+                <h3>- 게임시작을 누르면 완성된 사진이 보입니다.<br>
+                    - 사진은 5초뒤 섞이게 됩니다.<br>
+                    - 섞여진 사진을 완성된 사진과 같이 맞추면 됩니다.<br>
+                    - 사진이 섞인 뒤 시간이 흘러갑니다.<br>
+                    - 빠른 시간내에 맞추어 랭킹에 도전하세요!<br>
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div class="wrap-all">
+        <p class="play-time">Playtime</p>
+        <ul class="image-container">
+        </ul>
+        <button class="start-button">게임시작</button>
+        <button class="restart-button">다시시작</button>
+        <form class="game-text" method=POST action="/puzzleApp/insert/">
+            <div style="text-align: center;">성공!</div>
+            <label for="username">이름</label>
+            <input type="text" name="username" value={{username}} readonly><br>
+            <label for="temptime">걸린시간(초)</label>
+            <input type="text" name="temptime" id="temptime" readonly><br>
+            <label for="tempdate">성공한 날짜</label>
+            <input type="datetime-local" name="tempdate" id="tempdate" readonly><br>
+            <input type="submit" value="등록"
+                style="float: right; margin: 20px 20px 20px 0px; width: 50px; height: 30px;">
+            {% csrf_token %}
+        </form>
+    </div>
+
+    <script>
+
+        const container = document.querySelector(".image-container")
+        const starButton = document.querySelector(".start-button")
+        const restarButton = document.querySelector(".restart-button")
+        const gameText = document.querySelector(".game-text")
+        const playTime = document.querySelector(".play-time")
+
+        const tileCount = 16;
+
+        let tiles = [];
+        const dragged = {
+            el: null,
+            class: null,
+            index: null
+        }
+        let isPlaying = false;  // 플레이 변수
+        let timeInterval = null // 시간변수
+        let time = 0;
+        let temptime = 0;
+
+
+        function checkStatus() {
+            const currentList = [...container.children];
+            const unMatchedList = currentList.filter((child, index) => Number(child.getAttribute("data-index")) !== index)
+            if (unMatchedList.length === 0) {     // 맞을 경우 줄어듬
+                temptime = time;
+                gameText.style.display = "block";   // 사진 블록처리
+                isPlaying = false;
+                clearInterval(timeInterval) // 종료시간
+                // gameText.addEventListener("click", e => {
+                //     location.href = "test"
+                // })
+                document.getElementById("temptime").value = temptime;
+                document.getElementById("tempdate").value = new Date().toISOString().slice(0, 16);
+            }
+            
+
+        }
+        function setGame() {
+            isPlaying = true;
+            container.innerHTML = "";   // 중복되므로 초기화
+            time = 0;
+            playTime.style.display = 'inline-block' // 글자 블럭처리
+            gameText.style.display = 'none';
+            restarButton.style.display = 'block'
+            starButton.style.display = 'none'
+            document.querySelector(".puzzle-big").style.display = 'none'
+            clearInterval(timeInterval) // 실행 중 다시 시작할 수 있으므로 시간초기화
+
+            tiles = createImageTiles();
+            tiles.forEach(tile => container.appendChild(tile))
+            setTimeout(() => { // -초뒤 사진섞기
+                container.innerHTML = "";   // 중복되므로 초기화
+                shuffle(tiles).forEach(tile => container.appendChild(tile)) // 사진섞기
+                timeInterval = setInterval(() => {
+                    playTime.innerText = time;
+                    time++;                     // 1초씩 증가
+                }, 1000)
+            }, 5000) // -.000초뒤 섞임
+        }
+        function createImageTiles() {
+            const tempArray = [];
+            Array(tileCount).fill().forEach((_, i) => {       // 인덱스 16개 생성
+                const li = document.createElement("li");
+                li.setAttribute('data-index', i);            // 데이터인덱스 추가(옮길 때 비교하기 위해 사용)
+                li.setAttribute('draggable', 'true');       // 드래그 효과
+                li.classList.add(`list${i}`);               // 클래스 추가
+                tempArray.push(li);
+            })
+            return tempArray;
+        }
+        // 순서 섞는 함수 ( 공부 필요 )
+        function shuffle(array) {
+            let index = array.length - 1;
+            while (index > 0) {
+                const randomIndex = Math.floor(Math.random() * (index + 1));
+                [array[index], array[randomIndex]] = [array[randomIndex], array[index]]
+                index--;
+            }
+            return array;
+        }
+
+
+
+        container.addEventListener('dragstart', e => {     // 드래그 했을 떄 이벤트(target에서 classname확인가능)
+            if (!isPlaying) return;
+            const obj = e.target;
+            dragged.el = obj;
+            dragged.class = obj.className;
+            // console.log(typeof e.target.parentNode.children)    // 리스트출력(오브젝트형식이므로 강제 배열로저장)
+            dragged.index = [...obj.parentNode.children].indexOf(obj);  // ... 가지고 있는 기본 원소가 불러진다?
+        })
+        container.addEventListener('dragover', e => {     // 들고 있을 때 이벤트발생 않도록 막음
+            e.preventDefault()
+        })
+        container.addEventListener('drop', e => {     // 드롭 했을 떄 이벤트
+            if (!isPlaying) return;
+            const obj = e.target;
+
+            if (obj.className !== dragged.class) {
+                let originPlace;
+                let isLast = false;
+
+                if (dragged.el.nextSibling) {
+                    originPlace = dragged.el.nextSibling;       // 2. 땡겨온 시점 위치 저장
+                } else {
+                    originPlace = dragged.el.previousSibling;   // 3. 없다는 건 마지막이기떄문에 
+                    isLast = true;
+                }
+                const droppedIndex = [...obj.parentNode.children].indexOf(obj); // 공부필요
+                dragged.index > droppedIndex ? obj.before(dragged.el) : obj.after(dragged.el)
+                // 1. 앞 뒤 사진을 잘 바뀌도록(뒤로는 바뀌지 않았음 1칸만가능 / 공부필요 )
+                isLast ? originPlace.after(obj) : originPlace.before(obj)
+                // 4. 마지막이면 애프터/ 아닐경우 비포로 집어넣기
+            }
+            console.log({ obj })
+            checkStatus();
+        })
+
+        starButton.addEventListener('click', () => {
+            setGame();
+        })
+        restarButton.addEventListener('click', () => {
+            setGame();
+        })
+
+    </script>
+
+</body>
+
+</html>
