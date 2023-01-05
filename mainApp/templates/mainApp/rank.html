@@ -16,37 +16,14 @@
 
         <div class="dropdown">
             <select name="select" id="gameSelect">
-                <option value="">ballmung</option>
-                <option value="">Dog</option>
-                <option value="">Cat</option>
+                <option value="ballmung">ballmung</option>
+                <option value="puzzle">puzzle</option>
+                <option value="shooting">shooting</option>
             </select>
         </div>
 
         <div id="rankTable">      
-            <table class="">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Name</th>
-                        <th>Score</th>
-                        <th>Time</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% load time_filter %}
-                    {% load rank_filter %}
-                    {% for rd in rankdata %}
-                        <tr>
-                            <td>{{ forloop.counter | rank_filter:page_info.currentPage}}</td>
-                            <td>{{ rd.nickname }}</td>
-                            <td>{{ rd.score }}</td>
-                            <td>{{ rd.clearTime | time_filter }}</td>
-                            <td>{{ rd.regiDate }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            {% include "mainApp/ballmung_rank.html" %}
         </div>
 
         <div class="">
@@ -62,5 +39,28 @@
             </ul>
         </div>
     </div>
+
+    <script>
+        
+        let select = document.querySelector("#gameSelect")
+        select.addEventListener("change", (e)=>{
+            
+            if(select.value == "ballmung"){ //볼멍을 선택했을때
+                let f = fetch("/ballmungRank/")
+                f.then((response) => {
+                    return response.text();
+                }).then(result => {
+                    document.querySelector('#rankTable').innerHTML = result;
+                });
+            }else if(select.value == "puzzle"){ //퍼즐을 선택했을때
+                let f = fetch("/puzzleRank/")
+                f.then((response) => {
+                    return response.text();
+                }).then(result => {
+                    document.querySelector('#rankTable').innerHTML = result;
+                });
+            }
+        })
+    </script>
 </body>
 </html>

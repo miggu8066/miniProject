@@ -23,4 +23,6 @@ urlpatterns = [
     path("", mainViews.main, name="main"),
     path("main/", mainViews.main, name="main"),
     path("rank/", mainViews.rank, name="rank"),
+    path("ballmungRank/", mainViews.ballmungRank, name="ballmungRank"),
+    path("puzzleRank/", mainViews.puzzleRank, name="puzzleRank"),
 ]
