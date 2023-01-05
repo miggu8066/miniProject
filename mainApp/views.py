@@ -11,20 +11,20 @@ def main(request):
 #전체순위표
 def rank(request):
     if request.method == "GET":
-        rankinfo = rankInfo.objects.all() 
+        rankinfo = rankInfo.objects.all()
         rankinfo = rankinfo.order_by("-score", "clearTime") #-score 역순
-        
+
         page_info = {
             "startPage" : 1,
             "endPage" : 10,
             "underPageCount" : 10, #하단 페이지의 보여질 개수
             "currentPage" : 1,
             "totalPage" : 0,
-            "countPerPage" : 10, #페이지당 보여질 데이터수
+            "countPerPage" : 30, #페이지당 보여질 데이터수
         }
 
         #현재페이지
-        page_info["currentPage"] = request.GET.get('page')
+        page_info["currentPage"] = request.GET.get("page")
         if not page_info["currentPage"]: #현재페이지를 가져오지 못하면 1페이지를 보여줌
             page_info["currentPage"] = 1
         else:
@@ -49,7 +49,7 @@ def rank(request):
         paginator = Paginator(rankinfo, page_info["countPerPage"])  # 한페이지당 보여질 개수(데이터, 개수)
         rankinfo_s = paginator.get_page(page_info["currentPage"]) # 몇 페이지를 보여줄지 저장(1페이지의 10개의 데이터가 저장)
 
-
+        print(rankinfo_s)
         return render(request, "mainApp/rank.html", {"rankdata":rankinfo_s, "page_info":page_info, "pageRange":pageRange})
     elif request.method == "POST": 
         return render(request, "mainApp/main.html")
@@ -67,7 +67,7 @@ def ballmungRank(request):
         "underPageCount" : 10, #하단 페이지의 보여질 개수
         "currentPage" : 1,
         "totalPage" : 0,
-        "countPerPage" : 10, #페이지당 보여질 데이터수
+        "countPerPage" : 30, #페이지당 보여질 데이터수
     }
 
     #현재페이지
@@ -109,7 +109,7 @@ def puzzleRank(request):
         "underPageCount" : 10,
         "currentPage" : 1,
         "totalPage" : 0,
-        "countPerPage" : 10,
+        "countPerPage" : 30,
     }
     page_info["currentPage"] = request.GET.get('page')
     if not page_info["currentPage"]:

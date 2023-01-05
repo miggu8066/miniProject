@@ -23,15 +23,18 @@
     </tbody>
 </table>
 
-<div class="">
+<!--
+
+    <div class="">
     <ul class="pagination pagination-sm">
         <li class="page-item"><a class="page-link" href="{% url "mainApp:rank" %}?page={{ 1 }}">|&lt</a></li>
             <li class="page-item"><a class="page-link" href="#">&lt</a></li>
-            <!-- 페이지 숫자보이기 -->
-        {% for pr in pageRange%}    
+            {% for pr in pageRange%}    
             <li class="page-item"><a class="page-link" href="{% url "mainApp:rank" %}?page={{ pr }}">{{ pr }}</a></li>
         {% endfor %}
         <li class="page-item"><a class="page-link" href="#">&gt</a></li>
             <li class="page-item"><a class="page-link" href="{% url "mainApp:rank" %}?page={{ page_info.totalPage }}">&gt|</a></li>
     </ul>
 </div>
+
+-->

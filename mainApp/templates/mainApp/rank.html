@@ -22,13 +22,14 @@
             </select>
         </div>
 
-        <div id="rankTable">      
+        <div id="rankTable">
+
             {% include "mainApp/ballmung_rank.html" %}
+
         </div>
     </div>
 
-    <script>
-        
+    <script>  
         let select = document.querySelector("#gameSelect")
         select.addEventListener("change", (e)=>{
             
