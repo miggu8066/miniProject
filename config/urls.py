@@ -25,5 +25,6 @@ urlpatterns = [
     path("", include('mainApp.urls')),
     path("ballmung/", include('ballmungApp.urls')),
     path("puzzleApp/", include('puzzleApp.urls')),
+    path("shootingApp/", include('shootingApp.urls')),
     path("rank/", mainViews.rank, name="rank"),
 ]

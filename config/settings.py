@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "mainApp",
     "puzzleApp",
     "ballmungApp",
+    "shootingApp",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

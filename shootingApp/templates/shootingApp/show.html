@@ -1,0 +1,40 @@
+<head>
+    <h1>Space Shooting Rank</h1>
+    <style>
+        body {
+            margin-left: 450;
+            margin-top: 150;
+            
+            background-image: url("/static/shootingApp/images/space2.png");
+            background-repeat: no-repeat;
+            background-position-x: center;
+            background-position-y: center;
+            
+            /* background-size:cover; */
+        }
+    </style>
+    </head>
+    <body>
+        <table border = '10'>
+            <tr>
+                <th>순위</th>
+                <th>이름</th>
+                <th>점수</th>
+                <th>게임 종료 날짜</th>
+            </tr>
+            {% for pu in data %}
+            <tr>
+                <h3>
+                    <td>{{forloop.counter0|add:1}}</td>
+                    <td>{{pu.name}}</td>
+                    <td>{{pu.score}}</td>
+                    <td>{{pu.time_info}}</td>
+                </h3>
+            </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <input type="button" class="shootingreturn" value="게임 돌아가기"
+        onclick="location.href='../'" >
+    
+    </body>
