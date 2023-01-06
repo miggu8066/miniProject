@@ -35,7 +35,7 @@ def rank(request):
             page_info["currentPage"] = int(page_info["currentPage"]) #숫자로 형변환
             if page_info["currentPage"] <= 0:
                 page_info["currentPage"] = 1
-        print(page_info["currentPage"])
+
         #총페이지수
         page_info["totalPage"] = (rankinfo.count() // page_info["countPerPage"]) + 1
         if (rankinfo.count() % page_info["countPerPage"]) == 0: #한페이지에 보여질 수에 딱 맞아 떨어지면 1을 빼줘야됨
