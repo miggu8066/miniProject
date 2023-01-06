@@ -13,14 +13,26 @@
     {% include "nav.html" %}
 
     <div class="wrapper">
-
-        <div class="dropdown">
-            <select name="select" id="gameSelect">
-                <option value="ballmung">ballmung</option>
-                <option value="puzzle">puzzle</option>
-                <option value="shooting">shooting</option>
-            </select>
+        <div class="rank_header">
+            <div class="dropdown">
+                <div>
+                    <select name="select" id="gameSelect">
+                        <option value="ballmung">ballmung</option>
+                        <option value="puzzle">puzzle</option>
+                        <option value="shooting">shooting</option>
+                    </select>
+                </div>
+            </div>
+            <div class="rank_button">
+                <div>
+                    <span>전체순위표:</span>
+                    <button><a href="/ballmung/rank">볼멍</a></button>
+                    <button><a href="../puzzleApp/rank">퍼즐</a></button>
+                    <button><a href="/rank/ballmung/">슈팅</a></button>
+                </div>
+            </div>
         </div>
+        
 
         <div id="rankTable">
 

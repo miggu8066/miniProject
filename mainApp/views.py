@@ -49,7 +49,6 @@ def rank(request):
         paginator = Paginator(rankinfo, page_info["countPerPage"])  # 한페이지당 보여질 개수(데이터, 개수)
         rankinfo_s = paginator.get_page(page_info["currentPage"]) # 몇 페이지를 보여줄지 저장(1페이지의 10개의 데이터가 저장)
 
-        print(rankinfo_s)
         return render(request, "mainApp/rank.html", {"rankdata":rankinfo_s, "page_info":page_info, "pageRange":pageRange})
     elif request.method == "POST": 
         return render(request, "mainApp/main.html")

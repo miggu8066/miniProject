@@ -142,3 +142,25 @@ tbody>tr:nth-of-type(2n-1){
     background-color: rgba(235, 237, 232, 0.3);
     
 }
+
+.rank_header {
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+    width: 40%;
+    margin: 10px;
+}
+
+.rank_header .dropdown {
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-start;
+    padding: 10px;
+}
+
+.rank_header .rank_button {
+    display: flex;
+    flex-direction: row;
+    justify-content:flex-end;
+    padding: 10px;
+}
