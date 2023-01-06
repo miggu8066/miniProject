@@ -117,3 +117,15 @@ nav,section {
 #wrapper {
     background-color: rgba(240, 248, 255, 0.4);
 }
+
+.inner > footer {
+    position: inline-block;
+    display: flex;
+    justify-content: space;
+    margin: 5px;
+}
+
+.inner > footer > a {
+    background-image: url("../images/pic02.jpg");
+    background-size: cover;
+}
