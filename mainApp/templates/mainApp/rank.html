@@ -59,6 +59,13 @@
                 }).then(result => {
                     document.querySelector('#rankTable').innerHTML = result;
                 });
+            }else if(select.value == "shooting"){ //슈팅을 선택했을때
+                let f = fetch("/shootingRank/")
+                f.then((response) => {
+                    return response.text();
+                }).then(result => {
+                    document.querySelector('#rankTable').innerHTML = result;
+                });
             }
         })
     </script>

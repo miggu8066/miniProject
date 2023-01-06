@@ -1,0 +1,20 @@
+<table>
+    <thead>
+        <tr>
+            <th>순위</th>
+            <th>이름</th>
+            <th>점수</th>
+            <th>게임 종료 날짜</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pu in rankdata %}
+            <tr>
+                <td>{{forloop.counter0|add:1}}</td>
+                <td>{{pu.name}}</td>
+                <td>{{pu.score}}</td>
+                <td>{{pu.time_info}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

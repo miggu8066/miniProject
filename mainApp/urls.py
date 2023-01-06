@@ -25,4 +25,5 @@ urlpatterns = [
     path("rank/", mainViews.rank, name="rank"),
     path("ballmungRank/", mainViews.ballmungRank, name="ballmungRank"),
     path("puzzleRank/", mainViews.puzzleRank, name="puzzleRank"),
+    path("shootingRank/", mainViews.shootingRank, name="shootingRank"),
 ]
