@@ -19,17 +19,15 @@
     {% include "nav.html" %}
 
     <div class="wrapper">
-        <div>
+        <div class="gameScreen">
             <div>
                 <p id="info"></p>
             </div>
             <div>
                 <canvas id="myCanvas"></canvas>
-                <div id="resultScreen">
-
-                </div>
+                <div id="resultScreen"></div>
             </div>
-            <div>
+            <div class="buttonArrange">
                 <button id="saveButton">적립!!</button>
                 <button id="restartButton">다시시작</button>
             </div>
@@ -99,6 +97,7 @@
             isCountingBall: false,
             isSubmitToRank: false,
             isVisibleSubmitDiv: false,
+            isVisibleContainer: false,
         };
 
         let gameInfo = {
@@ -123,6 +122,7 @@
             isSubmitToRank: false,
             isCountingBall: false,
             isVisibleSubmitDiv: false,
+            isVisibleContainer: false,
         };
 
         //캔버스 사이즈 설정하기
@@ -292,7 +292,6 @@
                 //골인 지점을 감쌀 사각형
                 ctx.fillStyle = "rgba(172, 161, 222, 1)";
                 ctx.fillRect(gameInfo.goalArea.x, gameInfo.goalArea.y, gameInfo.goalArea.width, gameInfo.goalArea.height);
-                
             }
         }
 
@@ -302,6 +301,10 @@
 
             switch (gameInfo.gameState) {
                 case 0: //게임 시작전
+                    if(gameInfo.isVisibleContainer==false){
+                        document.querySelector(".container").style.display = "none";
+                    }
+                
                     drawWall();
                     gameStateScreen();
 
@@ -379,6 +382,7 @@
                             }
                         }
                         gameInfo.endState = 3;
+                        gameInfo.isVisibleContainer = true;
                         gameInfo.isSubmitToRank = true;
                     }else if(gameInfo.endState == 3){//골인 지점에 도착한공들 부드럽게 이동시키기
                         for (let i = 0; i < goalBallList.length; i++) {
@@ -393,6 +397,7 @@
 
                         // form태그에 값 전달시키기
                         if (gameInfo.isSubmitToRank == true){
+                            document.querySelector(".container").style.display = "block";
                             document.submitRankForm.score.value = gameInfo.score;
                             let time = gameInfo.timeLimit - gameInfo.currentSecond
                             document.submitRankForm.clearTime.value = time;

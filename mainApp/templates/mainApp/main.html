@@ -8,6 +8,8 @@
     <noscript><link rel="stylesheet" href="/static/ballmungApp/assets/css/noscript.css" /></noscript>
     <link rel="stylesheet" href="/static/ballmungApp/css/ballmung.css">
     
+    <style>
+    </style>
     
     <title>게임나라</title>
 </head>
@@ -18,20 +20,14 @@
         {% include "nav.html" %}
             <div id="header">
 
-                <!-- Nav -->
-                
-
                 <!-- Inner -->
                     <div class="inner">
                         <header>
-                            <span id="s1">🎠</span>
-                            <span id="s2">🏯</span>
-                            <span id="s3">🏯</span>
-                            <span id="s4">🏯</span>
-                            <span id="s5">🎠</span>
+                            
                             <h1>🎠🏯🏯🏯🎠</h1>
                             <hr/>
                             <p>Play and Enjoy!</p>
+                            
                         </header>
                         <footer>
                             <a href="/ballmung/"><img src="/static/ballmungApp/images/ballIcon100.png" style="margin-right: 40px;"></a>
@@ -54,8 +50,28 @@
     <script>
         {% comment %} let icon_s = [];
         for(let i = 0; i < 5; i++ ){
-            icon_s.push()
-        } {% endcomment %}
+            let s = document.querySelector(`#s${i+1}`);
+            let obj = { jump:7, gravity:0.2, dy: 7};
+            obj["x"] = s.getBoundingClientRect().left + window.pageXOffset;
+            obj["y"] = s.getBoundingClientRect().top + window.pageYOffset;
+            obj["init_x"] = obj.x;
+            obj["init_y"] = obj.y;
+            icon_s.push(obj);
+        }
+
+        function draw(){
+            for(let i = 0; i < icon_s.length; i++){
+                icon_s[i].y -= icon_s[i].dy;
+                icon_s[i].dy -= icon_s[i].gravity;
+                if(icon_s[i].y >= icon_s[i].init_y){
+                    icon_s[i].y = icon_s[i].init_y;
+                    icon_s[i].dy = icon_s[i].jump;
+                }
+                document.querySelector(`#s${i+1}`).style.cssText = `top: ${icon_s[i].y}`;
+            }
+        }
+
+        setInterval(draw,16); {% endcomment %}
     </script>
 
 </body>

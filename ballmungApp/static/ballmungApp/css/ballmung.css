@@ -122,6 +122,20 @@ nav,section {
     
 }
 
+.buttonArrange{
+    display: flex;
+    justify-content: center;
+    margin: 5px;
+}
+
+.buttonArrange > button{
+    margin-left: 5px;
+}
+
+.wrapper > .gameScreen{
+    margin: 15px;
+}
+
 .wrapper>.container{
     display: flex;
     flex-direction: column;
