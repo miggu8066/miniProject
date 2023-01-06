@@ -11,7 +11,8 @@
     <style>
         body {
             background-image:url("/static/shootingApp/images/space.png");
-            background-repeat: no-repeat;
+            background-size: auto;
+            /* background-repeat: no-repeat; */
             /* background-size:cover; */
         }
     </style>
@@ -19,9 +20,7 @@
     
     <style>
         .game-text {
-            position: absolute;
             width: 400px;
-            background-color: rgb(8, 4, 84);
             font-size: 45px;
             color: rgb(255, 255, 255);
             text-shadow: 1px 1px rgba(255, 0, 234, 0.956);
@@ -82,7 +81,7 @@
         <input type="submit" value="등록"
         style="float: right;
         margin-left: 200px;
-        /* margin: 20px 20px 20px 0px; */
+        margin: 20px 20px 20px 0px;
         width: 50px; height: 30px;">
         {% csrf_token %}
     </form>

@@ -28,18 +28,21 @@ def rank(request):
 
         #현재페이지
         page_info["currentPage"] = request.GET.get("page")
+        print(page_info["currentPage"])
         if not page_info["currentPage"]: #현재페이지를 가져오지 못하면 1페이지를 보여줌
             page_info["currentPage"] = 1
         else:
             page_info["currentPage"] = int(page_info["currentPage"]) #숫자로 형변환
             if page_info["currentPage"] <= 0:
                 page_info["currentPage"] = 1
-
+        print(page_info["currentPage"])
         #총페이지수
         page_info["totalPage"] = (rankinfo.count() // page_info["countPerPage"]) + 1
         if (rankinfo.count() % page_info["countPerPage"]) == 0: #한페이지에 보여질 수에 딱 맞아 떨어지면 1을 빼줘야됨
             page_info["totalPage"] -= 1
 
+        if page_info["currentPage"] >= page_info["totalPage"]:
+                page_info["currentPage"] = page_info["totalPage"]
         #시작, 끝페이지
         page_info["startPage"] = (page_info["currentPage"] // page_info["underPageCount"]) * page_info["underPageCount"] + 1
         page_info["endPage"] = page_info["startPage"] + page_info["underPageCount"] - 1
