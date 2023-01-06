@@ -19,5 +19,5 @@ def insert(request):
 
 
 def show(request):
-    shooting = Space_shooting.objects.all().order_by('score','time_info')
+    shooting = Space_shooting.objects.all().order_by('-score','time_info')
     return render(request, "shootingApp/show.html", {'data':shooting})
