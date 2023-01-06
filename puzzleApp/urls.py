@@ -8,7 +8,5 @@ urlpatterns = [
     path("name/", views.name),
     path("", views.start),
     path("insert/", views.insert),
-    path("show/", views.show, name='show'),
-
-    path("test/", views.test),
+    path("rank/", views.rank, name='rank'),
 ]

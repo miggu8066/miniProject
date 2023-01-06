@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from puzzleApp.models import Puzzle
+from django.core.paginator import Paginator
 
 
 def start(request):
@@ -25,9 +26,36 @@ def insert(request):
     return redirect('/puzzleApp/show/')
 
 
-def show(request):
+def rank(request):
     puzzle = Puzzle.objects.all().order_by('score','date')
-    return render(request, 'puzzleApp/show.html', {'data':puzzle})
 
-def test(request):
-    return render(request, "test.html")
+    page_info = {
+        "startPage" : 1,
+        "endPage" : 10,
+        "underPageCount" : 10,
+        "currentPage" : 1,
+        "totalPage" : 0,
+        "countPerPage" : 10,
+    }
+    page_info["currentPage"] = request.GET.get('page')
+    if not page_info["currentPage"]:
+        page_info["currentPage"] = 1
+    else:
+        page_info["currentPage"] = int(page_info["currentPage"])
+        if page_info["currentPage"] <= 0:
+            page_info["currentPage"] = 1
+    page_info["totalPage"] = (puzzle.count() // page_info["countPerPage"]) + 1
+    if (puzzle.count() % page_info["countPerPage"]) == 0:
+        page_info["totalPage"] -= 1
+    page_info["startPage"] = (page_info["currentPage"] // page_info["underPageCount"]) * page_info["underPageCount"] + 1
+    page_info["endPage"] = page_info["startPage"] + page_info["underPageCount"] - 1
+    if page_info["endPage"] > page_info["totalPage"]:
+        page_info["endPage"] = page_info["totalPage"]
+    pageRange = range(page_info["startPage"], page_info["endPage"]+1)
+    paginator = Paginator(puzzle, page_info["countPerPage"]) 
+    rankinfo_s = paginator.get_page(page_info["currentPage"]) 
+
+    return render(request, 'puzzleApp/rank.html', {"rankdata":rankinfo_s, "page_info":page_info, "pageRange":pageRange})
+
+
+    # return render(request, 'puzzleApp/rank.html', {'rankdata':puzzle})
