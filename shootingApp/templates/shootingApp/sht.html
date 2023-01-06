@@ -14,11 +14,17 @@
             background-size: auto;
             /* background-repeat: no-repeat; */
             /* background-size:cover; */
+            
         }
-    </style>
 
-    
-    <style>
+        body > div{
+            display: flex;
+            justify-content: center;
+        }
+
+        form {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
         .game-text {
             width: 400px;
             font-size: 45px;
@@ -30,62 +36,61 @@
             font-size: 20px;
             margin-left: 5px;
         }
+        button {
+            display: inline-block;
+            padding: 10px 40px;
+            font-size: 20px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #1a056f;
+            border: none;
+            border-radius: 40px;
+            box-shadow: 0 9px #999;
+        }
+          
+        button:hover {background-color: #670ab4}
+          
+        button:active {
+            background-color: #1a056f;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+ 
     </style>
-</head>
-<style>
-    button {
-      display: inline-block;
-      padding: 10px 40px;
-      font-size: 20px;
-      cursor: pointer;
-      text-align: center;
-      text-decoration: none;
-      outline: none;
-      color: #fff;
-      background-color: #1a056f;
-      border: none;
-      border-radius: 40px;
-      box-shadow: 0 9px #999;
-    }
-    
-    button:hover {background-color: #670ab4}
-    
-    button:active {
-      background-color: #1a056f;
-      box-shadow: 0 5px #666;
-      transform: translateY(4px);
-    }
-</style>
-    
+</head>   
     
 <body>
     {% include "nav.html" %}
 
-    <center>
-    <canvas id="canvas"></canvas>
-    <br>
-    <button id="start"> play </button>
-    <button id="pause"> pause </button>
-    <button id="restart"> retry </button>
-    <br>
-    </center>
+    <div>
+        <center>
+            <canvas id="canvas"></canvas>
+            <br>
+            <button id="start"> play </button>
+            <button id="pause"> pause </button>
+            <button id="restart"> retry </button>
+            <br>
+        </center>
 
-    <form class="game-text" method=POST action="/shootingApp/insert/">
-        <div style="text-align: center;">내 랭킹 등록하기</div>
-        <label for="username">이름</label>
-        <input type="text" name="username" id="username" required><br>
-        <label for="temptime">점수</label>
-        <input type="text" name="temptime" id="temptime" readonly><br>
-        <label for="tempdate">랭킹 등록 날짜</label>
-        <input type="datetime-local" name="tempdate" id="tempdate" readonly><br>
-        <input type="submit" value="등록"
-        style="float: right;
-        margin-left: 200px;
-        margin: 20px 20px 20px 0px;
-        width: 50px; height: 30px;">
-        {% csrf_token %}
-    </form>
-
+        <form class="game-text" method="post" action="/shootingApp/insert/">
+            <div style="text-align: center;">내 랭킹 등록하기</div>
+            <label for="username">이름</label>
+            <input type="text" name="username" id="username" required><br>
+            <label for="temptime">점수</label>
+            <input type="text" name="temptime" id="temptime" readonly><br>
+            <label for="tempdate">랭킹 등록 날짜</label>
+            <input type="datetime-local" name="tempdate" id="tempdate" readonly><br>
+            <input type="submit" value="등록"
+            style="float: right;
+            margin-left: 200px;
+            margin: 20px 20px 20px 0px;
+            width: 50px; height: 30px;">
+            {% csrf_token %}
+        </form>
+    </div>
     <script>
 
         let state = 0; //0:첫시작, 1:게임중, 2:게임오버
@@ -99,7 +104,7 @@
         canvas = document.querySelector("canvas")
         ctx = canvas.getContext("2d")
         canvas.width = 400;
-        canvas.height = 800;
+        canvas.height = 580;
 
         document.querySelector("#start").addEventListener("click",()=>{
             if(state == 0){
