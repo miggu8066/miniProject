@@ -6,4 +6,6 @@ urlpatterns = [
     path("", views.main),
     path("insert/", views.insert),
     path("show/", views.show),
+    path("rank/", views.rank, name="rank"),
+
 ]
