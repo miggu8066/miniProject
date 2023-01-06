@@ -172,6 +172,10 @@
             }
             this.update = function () {        //총알의 y 좌표
                 this.y -= 7;                 //총알의 속도 조절
+                if (this.y >= canvas.height - 64) {
+                    this.alive = false //죽은 총알
+                        enemyList.splice(i, 1);
+                }
             };
 
             this.checkHit = function () {
@@ -179,6 +183,7 @@
                 for (let i = 0; i < enemyList.length; i++) {
                     if (
                         this.y <= enemyList[i].y &&
+                        this.y >= enemyList[i].y - 32 &&
                         this.x >= enemyList[i].x &&
                         this.x <= enemyList[i].x + 40
                     ) {
