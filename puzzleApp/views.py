@@ -1,7 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from puzzleApp.models import Puzzle
+from puzzleApp.models import *
 from django.core.paginator import Paginator
+from .forms import FileUploadForm
 
 
 def start(request):
@@ -12,7 +13,7 @@ def name(request):
         return render(request, 'puzzleApp/puzzle_name')
     nameck = request.POST.get('username')
     if Puzzle.objects.filter(name=nameck).exists():
-        return HttpResponse("<script>alert('이름이 중복되었습니다');location.href='/puzzleApp/start';</script>")
+        return HttpResponse("<script>alert('이름이 중복되었습니다');location.href='/puzzleApp/';</script>")
     return render(request, 'puzzleApp/puzzle1.html', {'username':nameck})
 
 def insert(request):
@@ -23,7 +24,7 @@ def insert(request):
     date = request.POST.get('tempdate')
     p = Puzzle(name=username, score=score, date=date)
     p.save()
-    return redirect('/puzzleApp/show/')
+    return redirect('/puzzleApp/rank/')
 
 
 def rank(request):
@@ -56,6 +57,30 @@ def rank(request):
     rankinfo_s = paginator.get_page(page_info["currentPage"]) 
 
     return render(request, 'puzzleApp/rank.html', {"rankdata":rankinfo_s, "page_info":page_info, "pageRange":pageRange})
-
-
     # return render(request, 'puzzleApp/rank.html', {'rankdata':puzzle})
+
+def fileUpload(request):
+    if request.method == 'POST':
+        namecka = request.POST.get('username')
+        img = request.FILES["imgfile"]
+        fileupload = FileUpload(imgfile=img)
+        filename = fileupload.imgfile.name
+        fileupload.save()
+        # imgre = Image.open("/media/images.png")
+        # image_a = imgre.resize((400, 400))
+        # image_a.save("/media/images_re.png/")
+
+        return render(request, "puzzleApp/puzzle2.html", {'filename':filename,'username':namecka})
+
+def fileUpload1(request):
+    if request.method == 'POST':
+        namecka = request.POST.get('username')
+        fileuploadForm = FileUploadForm
+        context = {
+            'fileuploadForm': fileuploadForm,
+            'username':namecka
+        }
+        return render(request, 'puzzleApp/fileupload.html', context)
+
+def file(request):
+    return render(request, "puzzleApp/puzzle2.html")

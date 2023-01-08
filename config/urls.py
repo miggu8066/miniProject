@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.conf.urls.static import static
+from django.conf import settings
 from mainApp import views as mainViews
 from ballmungApp import views as ballmungViews
 from puzzleApp import views as puzzleViews
@@ -27,4 +29,4 @@ urlpatterns = [
     path("puzzleApp/", include('puzzleApp.urls')),
     path("shootingApp/", include('shootingApp.urls')),
     path("rank/", mainViews.rank, name="rank"),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -36,10 +36,11 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% load rank_filter %}
                     {% for pu in rankdata %}
                     <tr>
                         <h3>
-                            <td>{{forloop.counter0|add:1}}</td>
+                            <td>{{forloop.counter| rank_filter:page_info.currentPage}}</td>
                             <td>{{pu.name}}</td>
                             <td>{{pu.score}}</td>
                             <td>{{pu.date}}</td>
