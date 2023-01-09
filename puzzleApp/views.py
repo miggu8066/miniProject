@@ -12,8 +12,8 @@ def name(request):
     if request.method == 'GET':
         return render(request, 'puzzleApp/puzzle_name')
     nameck = request.POST.get('username')
-    if Puzzle.objects.filter(name=nameck).exists():
-        return HttpResponse("<script>alert('이름이 중복되었습니다');location.href='/puzzleApp/';</script>")
+    # if Puzzle.objects.filter(name=nameck).exists():
+    #     return HttpResponse("<script>alert('이름이 중복되었습니다');location.href='/puzzleApp/';</script>")
     return render(request, 'puzzleApp/puzzle1.html', {'username':nameck})
 
 def insert(request):
