@@ -12,11 +12,14 @@
             flex-direction: column;
             align-items: center;
         }
-        .puzzlebutton{
-            right: 0;
-            bottom: 0;
-            position: fixed;
-            margin: 0 30 30 0;
+        .underPageBar{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .underPageBar > input {
+            margin: 5px;
         }
     </style>
 </head>
@@ -50,7 +53,7 @@
                 </tbody>
             </table>
             <br>
-            <div class="">
+            <div class="underPageBar">
                 <ul class="pagination pagination-sm">
                     <li class="page-item"><a class="page-link" href="{% url "puzzleApp:rank" %}?page={{ 1 }}">|&lt</a></li>
                     <li class="page-item"><a class="page-link" href="#">&lt</a></li>
@@ -63,8 +66,8 @@
                     <li class="page-item"><a class="page-link" href="{% url "puzzleApp:rank" %}?page={{ page_info.totalPage
                             }}">&gt|</a></li>
                 </ul>
-            </div>
-            <input type="button" class="puzzlebutton" value="퍼즐로 돌아가기" onclick="location.href='../'" style="display: none;">
+                <input type="button" class="puzzlebutton" value="퍼즐로 돌아가기" onclick="location.href='../'" style="display: none;">
+            </div>   
         </div>
     </div>
     <script>
