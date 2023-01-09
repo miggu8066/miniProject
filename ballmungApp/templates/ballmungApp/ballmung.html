@@ -67,8 +67,10 @@
                     <p id="pTag_showScoreTime">score: 0점, 걸린시간:0.00초</p>
                     <input type="hidden" name="score" value="0"/>
                     <input type="hidden" name="clearTime" value="0"/>
-                    <input type="text" placeholder="닉네임 입력"name="name"/>
-                    <button>등록하기</button>
+                    <div>
+                        <input type="text" placeholder="닉네임 입력" name="name"  maxlength="16" required/>
+                        <button>등록하기</button>
+                    </div>
                     {% csrf_token %}
                 </form>
             </div>
@@ -134,11 +136,6 @@
         //버튼의 사이즈 설정하기
         gameInfo.chtp_ButtonSize.width = canvasSize.width - 10;
         gameInfo.chtp_ButtonSize.height = gameInfo.wallSize * 9;
-        //골 지역 위치 및 크기 설정하기
-        gameInfo.goalArea.x = 90;
-        gameInfo.goalArea.y = 290;
-        gameInfo.goalArea.width = 70;
-        gameInfo.goalArea.height = 40;
 
 
         //공 객체를 저장할 변수
@@ -153,6 +150,24 @@
 
         //
         let pInfo = document.querySelector('#info');
+
+        //벽 생성시키기 (한번만)
+        function createWall() {
+            for (let i = 0; i < map01[0].length; i++) {
+                for (let j = 0; j < map01.length; j++) {
+                    if (map01[j][i] == 1) {
+                        wallList.push(new Wall(i * gameInfo.wallSize, j * gameInfo.wallSize, gameInfo.wallSize));
+                    }else if(map01[j][i] == 2){
+                        //골 지역 위치 및 크기 설정하기
+                        gameInfo.goalArea.x = i * gameInfo.wallSize;
+                        gameInfo.goalArea.y = j * gameInfo.wallSize;
+                        gameInfo.goalArea.width = 7 * gameInfo.wallSize;
+                        gameInfo.goalArea.height = 4 * gameInfo.wallSize;
+                    }
+                }
+            }
+        }
+        createWall();
 
         //각종 변수들 출력하기
         function printInfo() {
@@ -215,17 +230,7 @@
 
         }
 
-        //벽 생성시키기 (한번만)
-        function createWall() {
-            for (let i = 0; i < map01[0].length; i++) {
-                for (let j = 0; j < map01.length; j++) {
-                    if (map01[j][i] == 1) {
-                        wallList.push(new Wall(i * gameInfo.wallSize, j * gameInfo.wallSize));
-                    }
-                }
-            }
-        }
-        createWall();
+        
 
         //벽 화면에 나타내기
         function drawWall() {
@@ -282,16 +287,26 @@
                 //남은 시간 보이기 좌표는 bottom right
                 ctx.fillStyle = "rgba(0,0,0,0.7)";
                 ctx.font = "italic bold 14px Arial, sans-serif";
-                ctx.textAlign = "right"
-                ctx.textBaseline = "bottom"
+                ctx.textAlign = "right";
+                ctx.textBaseline = "bottom";
                 tx = canvasSize.width;
                 ty = canvasSize.height;
                 ctx.fillText(`남은시간:${parseInt(gameInfo.currentSecond / 100)}`, tx-5, ty, 60); //텍스트, x좌표, y좌표, 최대너비
                 
             }else if(gameInfo.gameState == 2){
-                //골인 지점을 감쌀 사각형
-                ctx.fillStyle = "rgba(172, 161, 222, 1)";
-                ctx.fillRect(gameInfo.goalArea.x, gameInfo.goalArea.y, gameInfo.goalArea.width, gameInfo.goalArea.height);
+                if (gameInfo.endState == 3){
+                    //남은 시간 보이기 좌표는 bottom right
+                ctx.fillStyle = "rgba(0,0,0,0.8)";
+                ctx.font = "bold 25px Arial, sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "center";
+                ctx.fillText(`${gameInfo.score}점`, canvasSize.width/2, canvasSize.height*3/4); //텍스트, x좌표, y좌표, 최대너비
+                }else{
+                    //골인 지점을 감쌀 사각형
+                    ctx.fillStyle = "rgba(172, 161, 222, 1)";
+                    ctx.fillRect(gameInfo.goalArea.x, gameInfo.goalArea.y, gameInfo.goalArea.width, gameInfo.goalArea.height);
+                }
+                
             }
         }
 

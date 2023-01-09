@@ -122,6 +122,23 @@ nav,section {
     
 }
 
+.wrapper > .gameScreen{
+    margin: 15px;
+}
+
+.wrapper>.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 10px;
+}
+
+.wrapper>.gameScreen{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .buttonArrange{
     display: flex;
     justify-content: center;
@@ -132,15 +149,19 @@ nav,section {
     margin-left: 5px;
 }
 
-.wrapper > .gameScreen{
-    margin: 15px;
+#submitDiv{
+    background-color: rgba(255, 255, 255, 0.8);
+    border-color: black;
+    border: 1px;
+    padding: 5px;
+    margin: 10px 0px 10px 0px;
 }
 
-.wrapper>.container{
+form {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    margin: 10px;
+    align-items: center;
+    justify-content: center;
 }
 table{
     position: relative;

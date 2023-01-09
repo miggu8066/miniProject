@@ -3,13 +3,14 @@ class Wall{
     //벽의 중심점은 top left
     x;
     y;
-    size = 12; //벽의 크기
+    size;
     fillColor = "pink";
     borderColor = "black";
 
-    constructor(x , y){
+    constructor(x , y, size){
         this.x = x;
         this.y = y;
+        this.size = size;
     }
 
     getX() {
