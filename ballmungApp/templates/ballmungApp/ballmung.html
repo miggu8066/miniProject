@@ -111,7 +111,6 @@
                             1:도착한 공을 변수에 따로 넣기
                             2:도착한 공들 정렬시킬 좌표 정하기
                             3:골인 지점에 도착한공들 부드럽게 이동시키기
-                            4:종료
                             */
             //click here to play Button size
             chtp_ButtonSize: { x: 5, y: 5, width: 0, height: 0 },
@@ -286,12 +285,12 @@
 
                 //남은 시간 보이기 좌표는 bottom right
                 ctx.fillStyle = "rgba(0,0,0,0.7)";
-                ctx.font = "italic bold 14px Arial, sans-serif";
+                ctx.font = "bold 14px Arial, sans-serif";
                 ctx.textAlign = "right";
                 ctx.textBaseline = "bottom";
                 tx = canvasSize.width;
                 ty = canvasSize.height;
-                ctx.fillText(`남은시간:${parseInt(gameInfo.currentSecond / 100)}`, tx-5, ty, 60); //텍스트, x좌표, y좌표, 최대너비
+                ctx.fillText(`소모시간:${parseInt((gameInfo.timeLimit - gameInfo.currentSecond)/100)}`, tx-5, ty, 60); //텍스트, x좌표, y좌표, 최대너비
                 
             }else if(gameInfo.gameState == 2){
                 if (gameInfo.endState == 3){
@@ -500,16 +499,6 @@
             }
             ballList = [];
             goalBallList = [];
-            /*
-            gameInfo.gameState = init_gameInfo.gameState;
-            gameInfo.endState = init_gameInfo.endState; 
-            gameInfo.ontimer = init_gameInfo.ontimer;
-            gameInfo.currentSecond = init_gameInfo.currentSecond;
-            gameInfo.isCountingBall = init_gameInfo.isCountingBall;
-            gameInfo.score = init_gameInfo.score;
-            ballList = [];
-            goalBallList = [];
-            */
         });
 
         setInterval(draw, 16); // 약 60프레임 마다 실행
