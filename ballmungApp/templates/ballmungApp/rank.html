@@ -37,9 +37,9 @@
             <tbody>
                 {% load time_filter %}
                 {% load rank_filter %}
-                {% for rd in rankdata %}
+                {% for rd in rankdata.rankinfo_s %}
                     <tr>
-                        <td>{{ forloop.counter | rank_filter:page_info.currentPage}}</td>
+                        <td>{{ forloop.counter | rank_filter:rankdata.currentPage}}</td>
                         <td>{{ rd.nickname }}</td>
                         <td>{{ rd.score }}</td>
                         <td>{{ rd.clearTime | time_filter }}</td>
@@ -52,12 +52,12 @@
         <div class="">
             <ul class="pagination pagination-sm">
                 <li class="page-item"><a class="page-link" href="{% url "ballmungApp:rank" %}?page={{ 1 }}">|&lt</a></li>
-                    <li class="page-item"><a class="page-link" href="{% url "ballmungApp:rank" %}?page={{ page_info.currentPage | add:-1 }}">&lt</a></li>
-                    {% for pr in pageRange%}    
+                    <li class="page-item"><a class="page-link" href="{% url "ballmungApp:rank" %}?page={{ rankdata.currentPage | add:-1 }}">&lt</a></li>
+                    {% for pr in rankdata.pageRange%}    
                     <li class="page-item"><a class="page-link" href="{% url "ballmungApp:rank" %}?page={{ pr }}">{{ pr }}</a></li>
                     {% endfor %}
-                <li class="page-item"><a class="page-link" href="{% url "ballmungApp:rank" %}?page={{ page_info.currentPage | add:1 }}">&gt</a></li>
-                    <li class="page-item"><a class="page-link" href="{% url "ballmungApp:rank" %}?page={{ page_info.totalPage }}">&gt|</a></li>
+                <li class="page-item"><a class="page-link" href="{% url "ballmungApp:rank" %}?page={{ rankdata.currentPage | add:1 }}">&gt</a></li>
+                    <li class="page-item"><a class="page-link" href="{% url "ballmungApp:rank" %}?page={{ rankdata.totalPage }}">&gt|</a></li>
             </ul>
         </div>
     </div>
